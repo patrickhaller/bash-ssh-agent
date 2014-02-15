@@ -1,7 +1,8 @@
 # ssh agent management with one key per agent
 #
-# get list of potential agent socks
-# is key in list? use it, return
+# lookup key in ~/.ssh/config
+# get list of potential agent sockets
+# is key in list of sockets? use it, return
 # create new agent, add id
 
 ssh_config_get_key_by_host() {
