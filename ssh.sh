@@ -46,4 +46,4 @@ declare -f screen_run >/dev/null || screen_run() {
 	command $*
 }
 
-ssh_agent_check "DEFAULT"
+ssh-add -l &>/dev/null || ssh_agent_check "DEFAULT"
