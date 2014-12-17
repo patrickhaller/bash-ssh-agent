@@ -35,33 +35,8 @@ ssh_agent_check() {
 }
 scp_host() { local i; for i in "$@"; do [[ $i = *:/* ]] && echo "$i" | sed -e 's/:.*//'; done; }
 ssh_host() { local i; for i in "$@"; do [[ $i = *.* ]]  && echo "$i"; done; }
-ssh() { ssh_agent_check $(ssh_host "$@"); screen_run $1 ssh "$@" ; ssh_agent_check "DEFAULT"; }
+ssh() { ssh_agent_check $(ssh_host "$@"); command ssh "$@" ; ssh_agent_check "DEFAULT"; }
 scp() { ssh_agent_check $(scp_host "$@"); command scp "$@"; ssh_agent_check "DEFAULT"; }
 sshfs() { ssh_agent_check $(scp_host "$@"); command sshfs "$@";  ssh_agent_check "DEFAULT"; }
-
-__git_ssh() {
-	local cmd="$@"
-	[[ $1 == "-p" ]] && { shift; shift; }
-	local host="$1"
-	ssh_agent_check "${host#*@}"
-	command ssh $cmd
-	ssh_agent_check "DEFAULT"
-}
-
-[[ -d ${HOME}/.bash.d/patrickhaller/bash-ssh-agent/ ]] && {
-	export GIT_SSH="${HOME}/.bash.d/patrickhaller/bash-ssh-agent/git-ssh"
-	cat<<'EOF' > $GIT_SSH
-#!/bin/bash
-. ${HOME}/.bash.d/patrickhaller/bash-ssh-agent/master/ssh.sh
-__git_ssh "$@"
-EOF
-	chmod 755 $GIT_SSH
-}
-
-declare -f screen_run >/dev/null || screen_run() {
-	shift
-	[[ "$1" = "exec" ]] && builtin $*
-	command $*
-}
 
 ssh-add -l &>/dev/null || ssh_agent_check "DEFAULT"
