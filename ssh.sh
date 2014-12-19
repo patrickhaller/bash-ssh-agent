@@ -40,3 +40,13 @@ scp() { ssh_agent_check $(scp_host "$@"); command scp "$@"; ssh_agent_check "DEF
 sshfs() { ssh_agent_check $(scp_host "$@"); command sshfs "$@";  ssh_agent_check "DEFAULT"; }
 
 ssh-add -l &>/dev/null || ssh_agent_check "DEFAULT"
+
+export GIT_SSH="${HOME}/.git-ssh.sh"
+[[ ! -x $GIT_SSH ]] && {
+cat<<EOF >  $GIT_SSH
+#!/bin/bash
+source \${HOME}/.bashrc
+ssh \$*
+EOF
+chmod +x $GIT_SSH
+}
