@@ -33,6 +33,14 @@ ssh_agent_check() {
 	eval `ssh-agent` &>/dev/null
 	ssh-add $key &>/dev/null
 }
+ssh_agent_clean() {
+	local a
+	for a in /tmp/ssh*/agent*; do
+		SSH_AUTH_SOCK=$a ssh-add -l && continue
+		mv -v $( dirname $a ) /tmp/foo-$( basename $a )
+	done
+}
+
 scp_host() { local i; for i in "$@"; do [[ $i = *:/* ]] && echo "$i" | sed -e 's/:.*//'; done; }
 ssh_host() { local i; for i in "$@"; do [[ $i = *.* ]]  && echo "$i"; done; }
 ssh() { ssh_agent_check $(ssh_host "$@"); command ssh "$@" ; ssh_agent_check "DEFAULT"; }
