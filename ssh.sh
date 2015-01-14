@@ -30,6 +30,7 @@ ssh_key_in_list() {
 ssh_agent_check() {
 	local key=$(ssh_config_get_key_by_host $1 | sed -e "s#~#${HOME}#" )
 	ssh_key_in_list $key && { return 0; }
+	echo "Bash SSH spawning new agent..."
 	eval `ssh-agent` &>/dev/null
 	ssh-add $key &>/dev/null
 }
