@@ -50,6 +50,7 @@ sshfs() { ssh_agent_check $(scp_host "$@"); command sshfs "$@";  ssh_agent_check
 
 ssh-add -l &>/dev/null || ssh_agent_check "DEFAULT"
 
+export RSYNC_RSH="${HOME}/.git-ssh.sh"
 export GIT_SSH="${HOME}/.git-ssh.sh"
 [[ ! -x $GIT_SSH ]] && {
 cat<<EOF >  $GIT_SSH
