@@ -52,8 +52,8 @@ ssh_agent_clean() {
 
 scp_host() { local i; for i in "$@"; do [[ $i = *:/* ]] && echo "$i" | sed -e 's/:.*//'; done; }
 ssh_host() { local i; for i in "$@"; do [[ $i = *.* ]]  && echo "$i"; done; }
-ssh() { ssh_agent_check $(ssh_host "$@"); command ssh "$@" ; ssh_agent_check "DEFAULT"; }
-scp() { ssh_agent_check $(scp_host "$@"); command scp "$@"; ssh_agent_check "DEFAULT"; }
+ssh() { ssh_agent_check $(ssh_host "$@"); command ssh "$@"; local ret=$? ; ssh_agent_check "DEFAULT"; return $ret; }
+scp() { ssh_agent_check $(scp_host "$@"); command scp "$@"; local ret=$?; ssh_agent_check "DEFAULT"; return $ret; }
 sshfs() { ssh_agent_check $(scp_host "$@"); command sshfs "$@";  ssh_agent_check "DEFAULT"; }
 
 ssh-add -l &>/dev/null || ssh_agent_check "DEFAULT"
