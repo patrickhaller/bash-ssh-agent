@@ -4,8 +4,8 @@
 # get list of potential agent sockets
 # is key in list of sockets? use it, return
 # create new agent, add id
-${TMPDIR:=/tmp}
-${SSH_DEBUG:=0}
+TMPDIR=${TMPDIR:-/tmp}
+SSH_DEBUG=${SSH_DEBUG:-0}
 ssh_debug() { [[ ${SSH_DEBUG} == "0" ]] || echo "$@"; }
 
 ssh_config_get_key_by_host() {
