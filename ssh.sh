@@ -15,7 +15,7 @@ ssh_config_get_key_by_host() {
 	cat ${HOME}/.ssh/config | while read key value; do
 		[[ "$key" == "Host" ]] && { host_re="$value"; id="$default_id"; }
 		[[ "$key" == "IdentityFile" ]] && id="$value"
-		[[ "$key" == "" && $host =~ $host_re ]] && { echo $id; break; }
+		[[ "$key" == "" && $host == $host_re ]] && { echo $id; break; }
 	done
 }
 ssh_agent_list() {
