@@ -63,13 +63,15 @@ sshfs() { ssh_agent_check $(scp_host "$@"); command sshfs "$@";  ssh_agent_check
 
 ssh-add -l &>/dev/null || ssh_agent_check "DEFAULT"
 
-export RSYNC_RSH="${HOME}/.git-ssh.sh"
-export GIT_SSH="${HOME}/.git-ssh.sh"
-[[ ! -x $GIT_SSH ]] && {
-cat<<EOF >  $GIT_SSH
+git_ssh="${HOME}/.git-ssh.sh"
+export RSYNC_RSH="${git_ssh}"
+export GIT_SSH_COMMAND="${git_ssh}"
+unset GIT_SSH
+[[ ! -x "$git_ssh" ]] && {
+cat<<EOF >  "$git_ssh"
 #!/bin/bash
 source \${HOME}/.bashrc
 ssh \$*
 EOF
-chmod +x $GIT_SSH
+chmod +x "$git_ssh"
 }
