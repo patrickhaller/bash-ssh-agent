@@ -51,7 +51,11 @@ ssh_agent_clean() {
 	for a in /tmp/ssh*/agent*; do
 		[[ -e $a ]] || continue
 		SSH_AUTH_SOCK=$a ssh-add -l && continue
-		mv -v $( dirname $a ) /tmp/foo-$( basename $a )
+		for pid in $( lsof -t $a ); do
+			echo "SSH_AUTH_pid=${pid} ssh-agent -k"
+			SSH_AUTH_pid=$pid ssh-agent -k
+		done
+		[[ -e $a ]] && mv -v $( dirname $a ) /tmp/foo-$( dirname $a )
 	done
 }
 
