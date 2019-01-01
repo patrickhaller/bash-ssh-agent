@@ -44,7 +44,7 @@ ssh_agent_check() {
 	ssh-add $file &>/dev/null
 }
 ssh_agent_clean() {
-	local a
+	local a,p,s,pids
 	for a in /tmp/ssh*/agent*; do
 		SSH_AUTH_SOCK=$a ssh-add -l && continue
 		for pid in $( lsof -t $a ); do
@@ -53,11 +53,30 @@ ssh_agent_clean() {
 		done
 		[[ -e $a ]] && mv -v $( dirname $a ) /tmp/foo-$( dirname $a )
 	done
+	pids=$( ps h -C ssh-agent -o pid )
+	for p in $pids; do
+		s=$( expr $p - 1)
+		for a in /tmp/ssh*/agent.${s}; do
+			test -e "$a" && continue
+			echo "bad sock $a, killing $p"
+			kill -TERM $p
+		done
+	done
 }
 
 scp_host() { local i; for i in "$@"; do [[ $i = *:/* ]] && echo "$i" | sed -e 's/:.*//'; done; }
 ssh_host() { local i; for i in "$@"; do [[ $i = *.* ]]  && echo "$i"; done; }
-ssh() { ssh_agent_check $(ssh_host "$@"); command ssh "$@"; local ret=$? ; ssh_agent_check "DEFAULT"; return $ret; }
+ssh() {
+    ssh_agent_check $(ssh_host "$@")
+    if [[ "$TERM" == "dvtm" ]]; then
+        TERM=rxvt command ssh "$@"
+    else
+        command ssh "$@"
+    fi
+    local ret=$?
+    ssh_agent_check "DEFAULT"
+    return $ret
+}
 scp() { ssh_agent_check $(scp_host "$@"); command scp "$@"; local ret=$?; ssh_agent_check "DEFAULT"; return $ret; }
 sshfs() { ssh_agent_check $(scp_host "$@"); command sshfs "$@";  ssh_agent_check "DEFAULT"; }
 
